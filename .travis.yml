@@ -1,8 +1,8 @@
 language: csharp
-solution: AsyncSockets.sln
+solution: eleks-MP-2018.sln
 matrix:
   include:
     - mono: latest
       script:
-        - xbuild /p:Configuration=Release AsyncSockets/AsyncSockets.sln
+        - xbuild /p:Configuration=Release ./AsyncSockets/AsyncSockets.sln
   
