@@ -4,5 +4,5 @@ matrix:
   include:
     - mono: latest
       script:
-        - xbuild /p:Configuration=Release AsyncSockets.sln
+        - xbuild /p:Configuration=Release AsyncSockets/AsyncSockets.sln
   
