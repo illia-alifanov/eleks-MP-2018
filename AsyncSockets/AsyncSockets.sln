@@ -1,0 +1,25 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 15
+VisualStudioVersion = 15.0.27428.2037
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AsyncSockets", "AsyncSockets\AsyncSockets.csproj", "{6B82E140-488F-49C5-831F-B2235B71B391}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{6B82E140-488F-49C5-831F-B2235B71B391}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{6B82E140-488F-49C5-831F-B2235B71B391}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{6B82E140-488F-49C5-831F-B2235B71B391}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{6B82E140-488F-49C5-831F-B2235B71B391}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {B3AD955A-AE22-4838-A527-43C1BAC2127A}
+	EndGlobalSection
+EndGlobal
