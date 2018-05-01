@@ -4,10 +4,10 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{6B82E140-488F-49C5-831F-B2235B71B391}</ProjectGuid>
+    <ProjectGuid>{86328429-2595-4815-A9D3-5D818C4E3951}</ProjectGuid>
     <OutputType>Exe</OutputType>
-    <RootNamespace>AsyncSockets</RootNamespace>
-    <AssemblyName>AsyncSockets</AssemblyName>
+    <RootNamespace>AsyncSocketsClient</RootNamespace>
+    <AssemblyName>AsyncSocketsClient</AssemblyName>
     <TargetFrameworkVersion>v4.6.1</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
