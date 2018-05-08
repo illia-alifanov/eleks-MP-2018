@@ -26,8 +26,11 @@ namespace AsyncSocketsClient
             }
             try
             {
-                destinationAddr = IPAddress.Parse(args[0]);
-                destinationPort = int.Parse(args[1]);
+                //destinationAddr = IPAddress.Parse(args[0]);
+                //destinationPort = int.Parse(args[1]);
+                destinationAddr = IPAddress.Parse("172.21.20.61");
+                destinationPort = int.Parse("8000");
+
                 if (destinationPort <= 0)
                 {
                     throw new ArgumentException("Destination port number provided cannot be less than or equal to 0");
