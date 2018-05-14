@@ -44,7 +44,7 @@ namespace AsyncSocketsServer
             // Server starts listening for incoming connection requests
             Server server = new Server(connectionsNumber, receiveSize);
             server.Init();
-            server.Start(localEndPoint);
+            server.StartListen(localEndPoint);
         }
     }
 }
