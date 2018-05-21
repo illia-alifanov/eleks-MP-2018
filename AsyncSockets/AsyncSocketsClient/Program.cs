@@ -12,7 +12,7 @@ namespace AsyncSocketsClient
     class Program
     {
         static ManualResetEvent clientDone = new ManualResetEvent(false);
-
+        const int _prefixLength = 4;
         static void Main(string[] args)
         {
             IPAddress destinationAddr = null;          // IP Address of server to connect to
@@ -24,6 +24,7 @@ namespace AsyncSocketsClient
             {
                 Console.WriteLine("Usage: AsyncSocketClient.exe <destination IP address> <destination port number>");
             }
+
             try
             {
                 //destinationAddr = IPAddress.Parse(args[0]);
@@ -83,7 +84,14 @@ namespace AsyncSocketsClient
                 Console.WriteLine("Successfully connected to the server");
 
                 // Send 'Hello World' to the server
-                byte[] buffer = Encoding.UTF8.GetBytes("Hello World");
+                byte[] data = Encoding.UTF8.GetBytes("Hello World");
+                byte[] buffer = new byte[data.Length + _prefixLength];
+                // set prefix
+                byte[] prefix = BitConverter.GetBytes(data.Length);
+                Buffer.BlockCopy(prefix, 0, buffer, 0, _prefixLength);
+                // set data
+                Buffer.BlockCopy(data, 0, buffer, _prefixLength, data.Length);
+
                 e.SetBuffer(buffer, 0, buffer.Length);
                 Socket sock = e.UserToken as Socket;
                 bool willRaiseEvent = sock.SendAsync(e);
@@ -108,6 +116,9 @@ namespace AsyncSocketsClient
                 Console.WriteLine("Received from server: {0}", Encoding.UTF8.GetString(e.Buffer, 0, e.BytesTransferred));
 
                 // Data has now been sent and received from the server. Disconnect from the server
+                Console.WriteLine("Connection is closed. Press any key...");
+                Console.ReadKey();
+
                 Socket sock = e.UserToken as Socket;
                 sock.Shutdown(SocketShutdown.Send);
                 sock.Close();

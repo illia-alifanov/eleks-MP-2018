@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Net;
 using System.Net.Sockets;
+using System.Text;
 using System.Threading;
 
 namespace AsyncSocketsServer
@@ -16,6 +17,7 @@ namespace AsyncSocketsServer
         SocketAsyncEventArgsPool _readWritePool;
         int _totalBytesRead;           // counter of the total # bytes received by the server
         int _numConnectedSockets;      // the total number of clients connected to the server 
+        const int _receivePrefixLength = 4;
         Semaphore _maxNumberAcceptedClients;
 
         /// <summary>
@@ -62,7 +64,8 @@ namespace AsyncSocketsServer
                 readWriteEventArg.UserToken = new AsyncUserToken();
 
                 // assign a byte buffer from the buffer pool to the SocketAsyncEventArg object
-                _bufferManager.SetBuffer(readWriteEventArg);
+                //_bufferManager.SetBuffer(readWriteEventArg);
+                ResetBuffer(readWriteEventArg);
 
                 // add SocketAsyncEventArg to the pool
                 _readWritePool.Push(readWriteEventArg);
@@ -184,6 +187,25 @@ namespace AsyncSocketsServer
                 Interlocked.Add(ref _totalBytesRead, e.BytesTransferred);
                 Console.WriteLine("The server has read a total of {0} bytes", _totalBytesRead);
 
+                Int32 remainingBytesToProcess = e.BytesTransferred;
+
+                //remainingBytesToProcess = HandlePrefix(receiveSendEventArgs, receiveSendToken, remainingBytesToProcess);
+                byte[] prefix = new Byte[_receivePrefixLength];
+                byte[] data = new byte[_receiveBufferSize];
+
+                Buffer.BlockCopy(e.Buffer, 0, prefix, 0, _receivePrefixLength);
+                    remainingBytesToProcess = remainingBytesToProcess - _receivePrefixLength;
+
+                int recievedDataLength = remainingBytesToProcess;
+                Buffer.BlockCopy(e.Buffer, _receivePrefixLength, data, 0, remainingBytesToProcess);
+
+                byte[] returnData = GetAnswer(data, remainingBytesToProcess);
+                byte[] answerPrefix = BitConverter.GetBytes(returnData.Length);
+
+                ResetBuffer(e);
+                Buffer.BlockCopy(answerPrefix, 0, e.Buffer, 0, _receivePrefixLength);
+                Buffer.BlockCopy(returnData, 0, e.Buffer, _receivePrefixLength, returnData.Length);
+
                 //echo the data received back to the client
                 bool willRaiseEvent = token.Socket.SendAsync(e);
                 if (!willRaiseEvent)
@@ -191,11 +213,25 @@ namespace AsyncSocketsServer
                     ProcessSend(e);
                 }
 
+                //////////////////
+                //ResetBuffer(e);
+
             }
             else
             {
                 CloseClientSocket(e);
             }
+        }
+
+        private byte[] GetAnswer(byte[] data, int receivedLenth)
+        {
+            var receivedData = Encoding.UTF8.GetString(data);
+            var answerBuilder = new StringBuilder();
+            for (int i = receivedLenth - 1; i >= 0; i--)
+            {
+                answerBuilder.Append(receivedData.Substring(i, 1));
+            }
+            return Encoding.UTF8.GetBytes(answerBuilder.ToString());
         }
 
         /// <summary>
@@ -220,6 +256,13 @@ namespace AsyncSocketsServer
             {
                 CloseClientSocket(e);
             }
+        }
+
+        private void ResetBuffer(SocketAsyncEventArgs e)
+        {
+            var buffer = new Byte[_receiveBufferSize];
+
+            e.SetBuffer(buffer, 0, _receiveBufferSize);
         }
 
         private void CloseClientSocket(SocketAsyncEventArgs e)
