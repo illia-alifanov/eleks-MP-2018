@@ -1,8 +1,8 @@
 language: csharp
 solution: AsyncSockets.sln
+install:
+  - nuget restore ./AsyncSockets/AsyncSockets.sln
 matrix:
-  install:
-      - nuget restore ./AsyncSockets/AsyncSockets.sln
   include:
     - mono: latest
       script:
