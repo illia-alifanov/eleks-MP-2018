@@ -1,11 +1,8 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Net;
 using System.Net.Sockets;
 using System.Text;
 using System.Threading;
-using System.Threading.Tasks;
 
 namespace AsyncSocketsClient
 {
@@ -13,6 +10,7 @@ namespace AsyncSocketsClient
     {
         static ManualResetEvent clientDone = new ManualResetEvent(false);
         const int _prefixLength = 4;
+        const int _receiveBufferSize = 1024;
         static void Main(string[] args)
         {
             IPAddress destinationAddr = null;          // IP Address of server to connect to
@@ -48,6 +46,7 @@ namespace AsyncSocketsClient
             socketEventArg.Completed += new EventHandler<SocketAsyncEventArgs>(SocketEventArg_Completed);
             socketEventArg.RemoteEndPoint = new IPEndPoint(destinationAddr, destinationPort);
             socketEventArg.UserToken = sock;
+
             sock.ConnectAsync(socketEventArg);
             clientDone.WaitOne();
         }
@@ -109,26 +108,7 @@ namespace AsyncSocketsClient
         /// <summary>
         /// Called when a ReceiveAsync operation completes
         /// </summary>
-        private static void ProcessReceive(SocketAsyncEventArgs e)
-        {
-            if (e.SocketError == SocketError.Success)
-            {
-                Console.WriteLine("Received from server: {0}", Encoding.UTF8.GetString(e.Buffer, 0, e.BytesTransferred));
-
-                // Data has now been sent and received from the server. Disconnect from the server
-                Console.WriteLine("Connection is closed. Press any key...");
-                Console.ReadKey();
-
-                Socket sock = e.UserToken as Socket;
-                sock.Shutdown(SocketShutdown.Send);
-                sock.Close();
-                clientDone.Set();
-            }
-            else
-            {
-                throw new SocketException((int)e.SocketError);
-            }
-        }
+        
 
 
         /// <summary>
@@ -147,6 +127,39 @@ namespace AsyncSocketsClient
                 {
                     ProcessReceive(e);
                 }
+            }
+            else
+            {
+                throw new SocketException((int)e.SocketError);
+            }
+        }
+
+        private static void ProcessReceive(SocketAsyncEventArgs e)
+        {
+            if (e.SocketError == SocketError.Success)
+            {
+
+                byte[] prefix = new Byte[_prefixLength];
+                byte[] data = new byte[_receiveBufferSize];
+                int remainingBytesToProcess = e.BytesTransferred;
+
+                Buffer.BlockCopy(e.Buffer, 0, prefix, 0, _prefixLength);
+                remainingBytesToProcess = remainingBytesToProcess - _prefixLength;
+
+                int recievedDataLength = remainingBytesToProcess;
+                Buffer.BlockCopy(e.Buffer, _prefixLength, data, 0, remainingBytesToProcess);
+
+                Console.WriteLine("Received from server: {0}",
+                    Encoding.UTF8.GetString(data));
+
+                // Data has now been sent and received from the server. Disconnect from the server
+                Console.WriteLine("Connection is closed. Press any key...");
+                Console.ReadKey();
+
+                Socket sock = e.UserToken as Socket;
+                sock.Shutdown(SocketShutdown.Send);
+                sock.Close();
+                clientDone.Set();
             }
             else
             {

@@ -212,10 +212,6 @@ namespace AsyncSocketsServer
                 {
                     ProcessSend(e);
                 }
-
-                //////////////////
-                //ResetBuffer(e);
-
             }
             else
             {
